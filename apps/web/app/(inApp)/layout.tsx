@@ -7,6 +7,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import AppSidebar from "./sideBar"
 import { getServerSession } from "@/lib/auth-server"
+import { SessionRefresher } from "./session-refresher"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -19,6 +20,7 @@ export default async function InAppLayout({
 
   return (
     <SidebarProvider defaultOpen={false}>
+      <SessionRefresher />
       <Toaster />
       <AppSidebar />
       <SidebarInset>

@@ -1,14 +1,16 @@
 import { hc } from "hono/client"
-import type { AppType } from "@api"
+import type { AppType } from "@backend/api"
 import { getServerCookieHeaders } from "./auth-server"
 
-// Helper function to create authenticated client (server-side)
+// Server-side Hono client: forward the browser Cookie header only.
+// credentials:"omit" — never let Node absorb API Set-Cookie (desyncs browser).
+// Session sliding is browser-only (SessionRefresher + deferSessionRefresh).
 const createAuthenticatedClient = async () => {
   const headers = await getServerCookieHeaders()
 
   return hc<AppType>(process.env.NEXT_PUBLIC_SERVER_URL!, {
     init: {
-      credentials: "include",
+      credentials: "omit",
       headers: {
         cookie: headers.cookie,
         "Content-Type": "application/json",

@@ -1,0 +1,15 @@
+---
+description: Before committing, always build apps and run the test suite
+alwaysApply: true
+---
+
+# Pre-commit checks
+
+Before any git commit (and before pushing), always:
+
+1. Build to catch TypeScript errors:
+   `bun run build --filter=@backend/api --filter=@frontend/web`
+2. Run tests (API must use non-watch):
+   `bun run --filter @backend/api test:run`
+
+Only commit if both succeed. See also `AGENTS.md`.

@@ -1,8 +1,1 @@
-```
-npm install
-npm run dev
-```
-
-```
-open http://localhost:3000
-```
+See the repo root `README.md` and `AGENTS.md`.

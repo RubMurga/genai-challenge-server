@@ -1,0 +1,29 @@
+---
+description: Better Auth login and session rules (do not regress cookie refresh)
+alwaysApply: true
+---
+
+# Auth and sessions
+
+Login (Better Auth cookie) is not the same thing as a Google access token (~1h). Do not mix them.
+
+## Login
+
+- Google sign-in requests **identity only**. Extra APIs (Calendar, Drive, …) go on a later `linkSocial` with scopes — never on `socialProviders.google.scope`.
+- Use `prompt: "select_account"`, never `"consent"` on sign-in. Consent re-lists previously granted extra scopes.
+- Use `accessType: "offline"` so the first grant / new scopes can store a refresh token.
+- Always pass `errorCallbackURL` on `signIn.social`. Set `onAPIError.errorURL` to the web app.
+- Honor `callbackUrl` from the proxy (must start with `/`).
+
+## Session cookies
+
+- `expiresIn` must stay **≤ 400 days** (Chrome / better-call). Larger values 500 the OAuth callback. Do not set “100 years”.
+- Use sliding sessions: `expiresIn` + `updateAge` + `deferSessionRefresh: true`.
+- **Never refresh cookies on the server.** Next RSC, proxy, server actions, and Hono `auth.api.getSession` cannot apply `Set-Cookie` to the browser. That desyncs the session and looks like logout on the next navigation.
+- Server `get-session`: `disableRefresh=true`, `credentials: "omit"`. Treat HTTP 200 + JSON `null` as logged out.
+- Server Hono client: `credentials: "omit"`; forward the browser `Cookie` header only.
+- Proxy: `getSessionCookie` only. Do not call `get-session`.
+- Slide expiry in the browser via `SessionRefresher` (`authClient.useSession()`).
+
+@see https://www.better-auth.com/docs/concepts/session-management#defer-session-refresh
+@see https://www.better-auth.com/docs/integrations/next#auth-protection

@@ -11,17 +11,31 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { authClient } from "@/lib/auth"
+import {
+  socialCallbackURL,
+  socialErrorCallbackURL,
+} from "@/lib/auth-callback"
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+
 export default function SignUp() {
+  return (
+    <Suspense>
+      <SignUpForm />
+    </Suspense>
+  )
+}
+
+function SignUpForm() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const router = useRouter()
+  const searchParams = useSearchParams()
   const handleSignUp = async () => {
     const { error } = await authClient.signUp.email({
       name,
@@ -39,7 +53,8 @@ export default function SignUp() {
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${window.location.origin}/onboarding`,
+      callbackURL: socialCallbackURL(searchParams),
+      errorCallbackURL: socialErrorCallbackURL(),
     })
   }
 

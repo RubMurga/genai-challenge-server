@@ -1,0 +1,16 @@
+---
+description: Do not add extra markdown files; keep agent notes next to code
+alwaysApply: true
+---
+
+# Markdown
+
+Do not create or expand `.md` files unless the user asks. That includes README extras, ARCHITECTURE.md, LESSONS.md, and one-off notes.
+
+Durable guidance belongs in:
+
+- `AGENTS.md` (commit checks, pointers)
+- `.cursor/rules/*.mdc` (behavior the agent must follow)
+- Short comments next to the code they describe
+
+If you change login, sessions, or other behavior covered by a rule, update that `.mdc` in the same change. Do not add a second document that will go stale.

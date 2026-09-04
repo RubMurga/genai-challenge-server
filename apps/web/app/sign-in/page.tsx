@@ -13,13 +13,28 @@ import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
 import Image from "next/image"
 import { authClient } from "@/lib/auth"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import {
+  postLoginPath,
+  socialCallbackURL,
+  socialErrorCallbackURL,
+} from "@/lib/auth-callback"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
+
 export default function SignIn() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
+  )
+}
+
+function SignInForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const router = useRouter()
+  const searchParams = useSearchParams()
   const handleSignIn = async () => {
     const { error } = await authClient.signIn.email({
       email,
@@ -29,13 +44,14 @@ export default function SignIn() {
       toast.error(error.message)
     } else {
       toast.success("Signed in successfully")
-      router.push("/onboarding")
+      router.push(postLoginPath(searchParams))
     }
   }
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${window.location.origin}/onboarding`,
+      callbackURL: socialCallbackURL(searchParams),
+      errorCallbackURL: socialErrorCallbackURL(),
     })
   }
 
